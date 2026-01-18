@@ -163,9 +163,9 @@ Tracks referral relationships and conversions.
 - `/lookup_user [user_id]` - Look up information about a specific user
 - `/export_commissions` - Export commission data for payouts
 
-### Demo Videos
+## Demo Videos
 
-## Referral Program
+### Referral Program
 
 <table>
 <tr>
@@ -185,7 +185,7 @@ https://user-images.githubusercontent.com/7bab3bb2-9af2-4bee-84ee-740576e2e01a
 </tr>
 </table>
 
-## Payment Processing
+### Payment Processing
 
 <table>
 <tr>
