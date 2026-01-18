@@ -163,7 +163,7 @@ Tracks referral relationships and conversions.
 - `/lookup_user [user_id]` - Look up information about a specific user
 - `/export_commissions` - Export commission data for payouts
 
-###Demo Videos
+### Demo Videos
 
 ## Referral Program
 
