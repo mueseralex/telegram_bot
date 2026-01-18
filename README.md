@@ -10,7 +10,7 @@ The Framework is still being uploaded. This is Telegram Framework centered aroun
 
 - [README.md](README.md) - Main documentation and framework overview
 - [Framework/](Framework/) - Core package for creators to implement the bot framework
-- [Sample.md](Sample.md) - Example implementations and demos
+- [Sample.md](Sample.md) - Demo videos using the framework
 
 ## Non-Paid Users Bot Interactions
 
