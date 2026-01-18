@@ -78,6 +78,4 @@ graph LR
     class User,InitBot,Welcome,Buttons,WebAccess,CustomLink,Login,Referrals,ChangeWallet,CreatorDash,CreateRef default
 ```
 
-## Documentation
 
-*Documentation coming soon*
