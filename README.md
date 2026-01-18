@@ -78,92 +78,87 @@ graph LR
     class User,InitBot,Welcome,Buttons,WebAccess,CustomLink,Login,Referrals,ChangeWallet,CreatorDash,CreateRef default
 ```
 
-##Database Structures
+## Installation
 
-Installation:
 1. Clone the repository
-2. Install dependencies: pip install -r requirements.txt
-3. Set up environment variables
-4. Run the bot: python bot.py
-5. Run the webhook server: python webhook_server.py
+2. Install dependencies: `pip install -r requirements.txt`
+3. Set up environment variables (copy `env.example` to `.env` and configure)
+4. Run the bot: `python bot.py`
+5. Run the webhook server: `python webhook_server.py`
 
-DATABASE SCHEMA
---------------
+---
 
-Users Table:
+## Database Schema
+
+### Users Table
 Stores information about registered users.
-+------------------+----------+-------------------------------+
-| Column           | Type     | Description                   |
-+------------------+----------+-------------------------------+
-| telegram_id      | INTEGER  | Primary key, Telegram user ID |
-| username         | TEXT     | Telegram username             |
-| paid_amount      | REAL     | Total amount paid             |
-| is_premium       | BOOLEAN  | Premium status                |
-| registration_date| TIMESTAMP| When user registered          |
-| last_payment_date| TIMESTAMP| When user last paid           |
-+------------------+----------+-------------------------------+
 
-Wallets Table:
+| Column | Type | Description |
+|--------|------|-------------|
+| `telegram_id` | INTEGER | Primary key, Telegram user ID |
+| `username` | TEXT | Telegram username |
+| `paid_amount` | REAL | Total amount paid |
+| `is_premium` | BOOLEAN | Premium status |
+| `registration_date` | TIMESTAMP | When user registered |
+| `last_payment_date` | TIMESTAMP | When user last paid |
+
+### Wallets Table
 Stores user wallet addresses.
-+---------------+----------+-------------------------------+
-| Column        | Type     | Description                   |
-+---------------+----------+-------------------------------+
-| id            | INTEGER  | Primary key                   |
-| telegram_id   | INTEGER  | Foreign key to users          |
-| solana_address| TEXT     | Solana wallet address         |
-| added_date    | TIMESTAMP| When wallet was added         |
-| is_active     | BOOLEAN  | Whether wallet is active      |
-| removed_date  | TIMESTAMP| When wallet was removed       |
-+---------------+----------+-------------------------------+
 
-Payments Table:
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | INTEGER | Primary key |
+| `telegram_id` | INTEGER | Foreign key to users |
+| `solana_address` | TEXT | Solana wallet address |
+| `added_date` | TIMESTAMP | When wallet was added |
+| `is_active` | BOOLEAN | Whether wallet is active |
+| `removed_date` | TIMESTAMP | When wallet was removed |
+
+### Payments Table
 Records payment transactions.
-+---------------+----------+-------------------------------+
-| Column        | Type     | Description                   |
-+---------------+----------+-------------------------------+
-| id            | INTEGER  | Primary key                   |
-| telegram_id   | INTEGER  | Foreign key to users          |
-| solana_address| TEXT     | Wallet address used           |
-| amount        | REAL     | Payment amount in SOL         |
-| transaction_id| TEXT     | Solana transaction ID         |
-| payment_date  | TIMESTAMP| When payment was made         |
-+---------------+----------+-------------------------------+
 
-Referral Codes Table:
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | INTEGER | Primary key |
+| `telegram_id` | INTEGER | Foreign key to users |
+| `solana_address` | TEXT | Wallet address used |
+| `amount` | REAL | Payment amount in SOL |
+| `transaction_id` | TEXT | Solana transaction ID |
+| `payment_date` | TIMESTAMP | When payment was made |
+
+### Referral Codes Table
 Stores referral codes for users.
-+------------------+----------+-------------------------------+
-| Column           | Type     | Description                   |
-+------------------+----------+-------------------------------+
-| telegram_id      | INTEGER  | Primary key, foreign key      |
-| referral_username| TEXT     | Unique referral username      |
-| created_date     | TIMESTAMP| When code was created         |
-| payout_wallet    | TEXT     | Wallet for commission payouts |
-+------------------+----------+-------------------------------+
 
-Referrals Table:
+| Column | Type | Description |
+|--------|------|-------------|
+| `telegram_id` | INTEGER | Primary key, foreign key |
+| `referral_username` | TEXT | Unique referral username |
+| `created_date` | TIMESTAMP | When code was created |
+| `payout_wallet` | TEXT | Wallet for commission payouts |
+
+### Referrals Table
 Tracks referral relationships and conversions.
-+----------------+----------+-------------------------------+
-| Column         | Type     | Description                   |
-+----------------+----------+-------------------------------+
-| id             | INTEGER  | Primary key                   |
-| referrer_id    | INTEGER  | User who referred             |
-| referee_id     | INTEGER  | User who was referred         |
-| referral_date  | TIMESTAMP| When referral occurred        |
-| converted      | BOOLEAN  | Whether referee paid          |
-| conversion_date| TIMESTAMP| When conversion occurred      |
-| payment_amount | REAL     | Amount paid by referee        |
-| commission_owed| REAL     | Commission owed to referrer   |
-+----------------+----------+-------------------------------+
 
-BOT COMMANDS
------------
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | INTEGER | Primary key |
+| `referrer_id` | INTEGER | User who referred |
+| `referee_id` | INTEGER | User who was referred |
+| `referral_date` | TIMESTAMP | When referral occurred |
+| `converted` | BOOLEAN | Whether referee paid |
+| `conversion_date` | TIMESTAMP | When conversion occurred |
+| `payment_amount` | REAL | Amount paid by referee |
+| `commission_owed` | REAL | Commission owed to referrer |
 
-User Commands:
-- /start - Start the bot, check premium status, manage wallets
-- /referral - Manage referral code and view statistics
+---
 
-Admin Commands:
-- /admin_stats - View overall statistics
-- /lookup_user [user_id] - Look up information about a specific user
-- /export_commissions - Export commission data for payouts
+## Bot Commands
 
+### User Commands
+- `/start` - Start the bot, check premium status, manage wallets
+- `/referral` - Manage referral code and view statistics
+
+### Admin Commands
+- `/admin_stats` - View overall statistics
+- `/lookup_user [user_id]` - Look up information about a specific user
+- `/export_commissions` - Export commission data for payouts
