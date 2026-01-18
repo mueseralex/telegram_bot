@@ -1,0 +1,8 @@
+flask==2.0.1
+flask-cors==3.0.10
+requests==2.26.0
+pyjwt==2.1.0
+gunicorn==20.1.0
+sqlalchemy==1.4.23
+python-dotenv==0.19.0
+python-telegram-bot==20.6 

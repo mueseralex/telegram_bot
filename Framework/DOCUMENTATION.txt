@@ -1,0 +1,282 @@
+TRANSLUCENT BOT DOCUMENTATION
+=============================
+
+OVERVIEW
+--------
+The Translucent Bot is a Telegram bot that manages premium access to Translucent services. It handles user registration, wallet management, payments, and a referral program.
+
+FEATURES
+--------
+* User registration and management
+* Wallet linking and management
+* Payment processing via Solana blockchain
+* Referral program with commission tracking
+* Administrative tools for monitoring and management
+
+PROJECT STRUCTURE
+----------------
+Telegram/
+├── config.py               # Configuration variables
+├── database.py             # Database implementation
+├── bot.py                  # Main bot entry point
+├── webhook_server.py       # Payment webhook handler
+├── handlers/               # Command handlers directory
+│   ├── __init__.py         # Makes the directory a package
+│   ├── start_handler.py    # /start command and wallet management
+│   ├── referral_handler.py # /referral command and referral management
+│   ├── admin_handler.py    # Admin commands
+│   └── utils.py            # Shared utilities for handlers
+└── keyboards/              # Keyboard layouts
+    ├── __init__.py         # Makes the directory a package
+    ├── start_keyboards.py  # Keyboards for start command
+    └── referral_keyboards.py # Keyboards for referral command
+
+SETUP AND CONFIGURATION
+----------------------
+
+Prerequisites:
+- Python 3.7+
+- python-telegram-bot library
+- Flask (for webhook server)
+- SQLite3
+
+Environment Variables:
+- BOT_TOKEN: Telegram bot token from BotFather
+- DATABASE_PATH: Path to SQLite database file
+- DEPOSIT_ADDRESS: Solana wallet address for receiving payments
+- REQUIRED_PAYMENT: Amount of SOL required for premium access (default: 0.5)
+- COMMISSION_PERCENTAGE: Percentage commission for referrals (default: 5.0)
+- ADMIN_IDS: Comma-separated list of Telegram user IDs with admin access
+
+Installation:
+1. Clone the repository
+2. Install dependencies: pip install -r requirements.txt
+3. Set up environment variables
+4. Run the bot: python bot.py
+5. Run the webhook server: python webhook_server.py
+
+DATABASE SCHEMA
+--------------
+
+Users Table:
+Stores information about registered users.
++------------------+----------+-------------------------------+
+| Column           | Type     | Description                   |
++------------------+----------+-------------------------------+
+| telegram_id      | INTEGER  | Primary key, Telegram user ID |
+| username         | TEXT     | Telegram username             |
+| paid_amount      | REAL     | Total amount paid             |
+| is_premium       | BOOLEAN  | Premium status                |
+| registration_date| TIMESTAMP| When user registered          |
+| last_payment_date| TIMESTAMP| When user last paid           |
++------------------+----------+-------------------------------+
+
+Wallets Table:
+Stores user wallet addresses.
++---------------+----------+-------------------------------+
+| Column        | Type     | Description                   |
++---------------+----------+-------------------------------+
+| id            | INTEGER  | Primary key                   |
+| telegram_id   | INTEGER  | Foreign key to users          |
+| solana_address| TEXT     | Solana wallet address         |
+| added_date    | TIMESTAMP| When wallet was added         |
+| is_active     | BOOLEAN  | Whether wallet is active      |
+| removed_date  | TIMESTAMP| When wallet was removed       |
++---------------+----------+-------------------------------+
+
+Payments Table:
+Records payment transactions.
++---------------+----------+-------------------------------+
+| Column        | Type     | Description                   |
++---------------+----------+-------------------------------+
+| id            | INTEGER  | Primary key                   |
+| telegram_id   | INTEGER  | Foreign key to users          |
+| solana_address| TEXT     | Wallet address used           |
+| amount        | REAL     | Payment amount in SOL         |
+| transaction_id| TEXT     | Solana transaction ID         |
+| payment_date  | TIMESTAMP| When payment was made         |
++---------------+----------+-------------------------------+
+
+Referral Codes Table:
+Stores referral codes for users.
++------------------+----------+-------------------------------+
+| Column           | Type     | Description                   |
++------------------+----------+-------------------------------+
+| telegram_id      | INTEGER  | Primary key, foreign key      |
+| referral_username| TEXT     | Unique referral username      |
+| created_date     | TIMESTAMP| When code was created         |
+| payout_wallet    | TEXT     | Wallet for commission payouts |
++------------------+----------+-------------------------------+
+
+Referrals Table:
+Tracks referral relationships and conversions.
++----------------+----------+-------------------------------+
+| Column         | Type     | Description                   |
++----------------+----------+-------------------------------+
+| id             | INTEGER  | Primary key                   |
+| referrer_id    | INTEGER  | User who referred             |
+| referee_id     | INTEGER  | User who was referred         |
+| referral_date  | TIMESTAMP| When referral occurred        |
+| converted      | BOOLEAN  | Whether referee paid          |
+| conversion_date| TIMESTAMP| When conversion occurred      |
+| payment_amount | REAL     | Amount paid by referee        |
+| commission_owed| REAL     | Commission owed to referrer   |
++----------------+----------+-------------------------------+
+
+BOT COMMANDS
+-----------
+
+User Commands:
+- /start - Start the bot, check premium status, manage wallets
+- /referral - Manage referral code and view statistics
+
+Admin Commands:
+- /admin_stats - View overall statistics
+- /lookup_user [user_id] - Look up information about a specific user
+- /export_commissions - Export commission data for payouts
+
+USER FLOWS
+---------
+
+New User Registration:
+1. User sends /start
+2. Bot welcomes user and explains premium access
+3. User links wallet
+4. User makes payment
+5. Bot detects payment and grants premium access
+
+Referral Program:
+1. User sends /referral
+2. User creates referral code
+3. User connects payout wallet
+4. User shares referral link
+5. New users join via referral link
+6. When referred users pay, referrer earns commission
+
+WEBHOOK SERVER
+-------------
+The webhook server listens for payment notifications from Helius (Solana blockchain API). When a payment is detected:
+
+1. Validates the transaction
+2. Finds the user by wallet address
+3. Records the payment
+4. Updates premium status if payment is sufficient
+5. Processes referral commission if applicable
+
+ADMIN FEATURES
+-------------
+Administrators can:
+- View overall statistics
+- Look up specific users
+- Export user data, payment history, and referral information
+- Manually set or remove premium status
+
+ERROR HANDLING
+-------------
+The bot includes error handling for:
+- Invalid wallet addresses
+- Duplicate referral usernames
+- Missing payments
+- Database errors
+
+SECURITY CONSIDERATIONS
+---------------------
+- Admin commands are restricted to authorized users
+- Wallet addresses are validated before storage
+- Transactions are verified against the blockchain
+- Referral usernames are checked for uniqueness and validity
+
+MAINTENANCE
+----------
+Regular maintenance tasks:
+- Database backups
+- Monitoring webhook server uptime
+- Checking for failed payment detections
+- Processing referral commissions
+
+TROUBLESHOOTING
+--------------
+
+Common Issues:
+
+1. Payment not detected
+   - Check webhook server logs
+   - Verify transaction on Solana explorer
+   - Ensure wallet is properly linked
+
+2. Referral not tracking
+   - Verify referral link format
+   - Check database for referral relationship
+
+3. Bot not responding
+   - Check Telegram API status
+   - Verify bot token is valid
+   - Check server logs for errors
+
+Logging:
+The bot uses Python's logging module to log important events:
+- INFO level: Normal operations
+- WARNING level: Potential issues
+- ERROR level: Failed operations
+- CRITICAL level: System failures
+
+Logs are output to the console and can be redirected to a file.
+
+DEVELOPMENT
+----------
+
+Adding New Features:
+To add new features to the bot:
+1. Create appropriate database tables/columns
+2. Add handler functions in the relevant handler file
+3. Register handlers in bot.py
+4. Update documentation
+
+Testing:
+Before deploying changes:
+1. Test all user flows
+2. Verify database operations
+3. Test payment detection
+4. Test referral tracking
+
+API INTEGRATION
+-------------
+
+Helius Webhook:
+The bot uses Helius webhooks to detect Solana transactions:
+1. Create a webhook on Helius dashboard
+2. Configure it to send notifications to your webhook server URL
+3. Set up filters for SOL transfers to your deposit address
+
+Telegram Bot API:
+The bot uses python-telegram-bot library to interact with Telegram:
+1. Create a bot via BotFather
+2. Get the bot token
+3. Set up commands in BotFather
+
+DEPLOYMENT
+---------
+
+Production Setup:
+For production deployment:
+1. Use a proper web server (Nginx, Apache) with HTTPS
+2. Set up process management (systemd, supervisor)
+3. Configure proper logging
+4. Set up database backups
+5. Use environment variables for sensitive information
+
+Scaling:
+If the bot needs to handle more users:
+1. Consider using a more robust database (PostgreSQL)
+2. Implement connection pooling
+3. Set up load balancing for webhook server
+4. Implement caching for frequent operations
+
+FUTURE ENHANCEMENTS
+-----------------
+Potential improvements:
+1. Multi-currency support
+2. Subscription-based model
+3. Enhanced analytics dashboard
+4. Automated commission payouts
+5. Integration with other blockchain networks 
